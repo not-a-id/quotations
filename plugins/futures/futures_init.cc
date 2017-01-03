@@ -84,7 +84,7 @@ static handler_t OnTimeOut(struct server *srv, char *id, int opcode, int time) {
   return HANDLER_GO_ON;
 }
 
-int Futures_plugin_init(struct plugin *pl) {
+int futures_plugin_init(struct plugin *pl) {
   pl->init = OnFuturesStart;
   pl->clean_up = OnFuturesShutdown;
   pl->connection = OnFuturesConnect;
