@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string>
+#include "logic/base_values.h"
 #include "basic/basictypes.h"
 #include "basic/native_library.h"
 #include "net/comm_head.h"
@@ -16,8 +17,39 @@
 
 namespace logic {
 
+class BaseValue {
+ public:
+  static base_logic::Value* Deserialize(std::string* str);
+
+  static bool GetBigInteger(base_logic::DictionaryValue* dict_value,
+                            const std::wstring& path, int64* out_value);
+
+  static bool GetReal(base_logic::DictionaryValue* dict_value,
+                      const std::wstring& path, double* out_value);
+
+  static bool GetString(base_logic::DictionaryValue* dict_value,
+                        const std::wstring& path, std::string* out_value);
+
+  static bool GetString(base_logic::DictionaryValue* dict_value,
+                        const std::wstring& path, std::wstring* out_value);
+
+
+
+  static bool GetReal(base_logic::Value* value, double* out_value);
+
+  static bool GetBigInteger(base_logic::Value* value, int64* out_value);
+
+  static bool GetString(base_logic::Value* value, std::string* out_value);
+
+ private:
+  static bool StringToInt64(base_logic::Value* value, int64* out);
+  static bool StringToDouble(base_logic::Value* value, double* out);
+
+};
+
 class SomeUtils {
  public:
+
   static void* GetLibraryFunction(const std::string& library_name,
                                   const std::string& func_name);
 
@@ -81,46 +113,5 @@ class SomeUtils {
   }
 };
 
-class SendUtils {
- public:
-  static int32 SendFull(int socket, const char* buffer, size_t bytes);
-  static bool SendBytes(int socket, const void* bytes, int32 len,
-                        const char* file, int32 line);
-  static bool SendMessage(int socket, struct PacketHead* packet,
-                          const char* file, int32 line);
-  static bool SendHeadMessage(int socket, int32 operate_code, int32 type,
-                              int32 is_zip_encrypt, int64 session,
-                              int32 reserved, const char* file, int32 line);
-
-  static bool SendErronMessage(int socket, int32 operate_code, int32 type,
-                               int32 is_zip_encrypt, int64 session,
-                               int32 reserved, int32 error, const char* file,
-                               int32 line);
-
-  static struct threadrw_t* socket_lock_;
-};
-}  //  namespace logic
-
-#define send_bytes (socket, bytes, len)\
-    logic::SomeUtils::SendBytes(socket, bytes, len, __FILE__, __LINE__)\
-
-
-#define send_message(socket, packet) \
-    logic::SendUtils::SendMessage(socket, packet, __FILE__, __LINE__)\
-
-
-#define send_headmsg(socket, operate_code, type, is_zip_encrypt, \
-        reserved, session)\
-    logic::SendUtils::SendHeadMessage(socket, operate_code, type, \
-            is_zip_encrypt, reserved, session, __FILE__, __LINE__)\
-
-
-#define send_errnomsg(socket, operate_code, type, is_zip_encrypt, \
-        reserved, session, error)\
-    logic::SendUtils::SendErronMessage(socket, operate_code, type, \
-            is_zip_encrypt, reserved, session, error, __FILE__, __LINE__)\
-
-#define closelockconnect(socket) \
-    shutdown(socket, SHUT_RDWR);
-
+}
 #endif /* LOGIC_UNIT_H_ */
