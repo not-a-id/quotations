@@ -93,8 +93,26 @@ goods_init.o : ./goods_init.cc ./goods_init.h
 goods_logic.o : ./goods_logic.cc ./goods_logic.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./goods_logic.cc $(INCLUDE_PATHS)
 
+fx_pull_engine.o : ./fx_pull_engine.cc ./fx_pull_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./fx_pull_engine.cc $(INCLUDE_PATHS)
 
-$(PLUGIN) : goods_init.o  goods_logic.o \
+jh_pull_engine.o : ./jh_pull_engine.cc ./jh_pull_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./jh_pull_engine.cc $(INCLUDE_PATHS)
+	
+pull_engine.o : ./pull_engine.cc ./pull_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./pull_engine.cc $(INCLUDE_PATHS)
+	
+logic_unit.o :  $(USER_DIR)/logic/logic_unit.cc $(USER_DIR)/logic/logic_unit.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/logic_unit.cc $(INCLUDE_PATHS)
+	
+quotations_infos.o :  $(USER_DIR)/logic/quotations_infos.cc $(USER_DIR)/logic/quotations_infos.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/quotations_infos.cc $(INCLUDE_PATHS)
+
+http_api.o :  $(USER_DIR)/logic/quotations_infos.cc $(USER_DIR)/logic/quotations_infos.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/quotations_infos.cc $(INCLUDE_PATHS)
+
+$(PLUGIN) : goods_init.o  goods_logic.o fx_pull_engine.o logic_unit.o quotations_infos.o \
+	jh_pull_engine.o \
 	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lrt -ldl -lmysqlclient \
 	$^ -o $@
