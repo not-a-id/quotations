@@ -24,6 +24,14 @@ Goodslogic::Goodslogic() {
 }
 
 Goodslogic::~Goodslogic() {
+  if (goods_redis_) {
+    delete goods_redis_;
+    goods_redis_ = NULL;
+  }
+  if (goods_schduler_) {
+    delete goods_schduler_;
+    goods_schduler_ = NULL;
+  }
 }
 
 bool Goodslogic::Init() {
@@ -33,6 +41,12 @@ bool Goodslogic::Init() {
   if (config == NULL)
     return false;
   r = config->LoadConfig(path);
+  if (config == NULL)
+    return false;
+  goods_redis_ = new goods_logic::GoodsRedis(config);
+  goods_schduler_ = goods_logic::GoodsSchdulerEngine::GetSchdulerManager();
+  goods_schduler_->InitRedis(goods_redis_);
+
   return true;
 }
 
@@ -85,16 +99,13 @@ bool Goodslogic::OnBroadcastClose(struct server *srv, const int socket) {
 
 bool Goodslogic::OnIniTimer(struct server *srv) {
   if (srv->add_time_task != NULL) {
-    srv->add_time_task(srv, "crawler_task", TIME_UPDATE_DATA, 10, -1);
+    srv->add_time_task(srv, "goods", UPDATE_GOODS_DATA, 30, -1);
   }
   return true;
 }
 
 bool Goodslogic::OnTimeout(struct server *srv, char *id, int opcode, int time) {
-  switch (opcode) {
-    default:
-      break;
-  }
+  goods_schduler_->TimeEvent(opcode, time);
   return true;
 }
 

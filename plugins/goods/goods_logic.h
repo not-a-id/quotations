@@ -6,8 +6,8 @@
 
 #include "basic/basictypes.h"
 #include "core/common.h"
-//#include "net/comm_head.h"
-//#include "net/packet_processing.h"
+#include "goods/goods_redis.h"
+#include "goods/goods_schduler_engine.h"
 
 namespace goods_logic {
 
@@ -44,6 +44,9 @@ public:
 
 private:
   bool Init();
+private:
+  goods_logic::GoodsRedis*    goods_redis_;
+  goods_logic::GoodsSchdulerManager*  goods_schduler_;
 };
 } // namespace goods_logic
 
