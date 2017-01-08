@@ -13,6 +13,91 @@
 
 namespace quotations_logic {
 
+class PlatformSymbol {
+ public:
+  PlatformSymbol();
+  PlatformSymbol(const PlatformSymbol& platform_symbol);
+
+  PlatformSymbol& operator =(const PlatformSymbol& platform_symbol);
+
+  ~PlatformSymbol() {
+    if (data_ != NULL) {
+      data_->Release();
+    }
+  }
+
+  void set_platform_type(const int32 platform_type) {
+    data_->platform_type_ = platform_type;
+  }
+
+  void set_platform_name(const std::string& platform_name) {
+    data_->platform_name_ = platform_name;
+  }
+
+  void set_symbol(const std::string& symbol) {
+    data_->symbol_ = symbol;
+  }
+
+  void set_exchange_name(const std::string& exchange_name) {
+    data_->exchange_name_ = exchange_name;
+  }
+
+  void set_show_name(const std::string& show_name) {
+    data_->show_name_ = show_name;
+  }
+
+  const int32 platform_type() const {
+    return data_->platform_type_;
+  }
+  const std::string& platform_name() const {
+    return data_->platform_name_;
+  }
+  const std::string& symbol() const {
+    return data_->symbol_;
+  }
+  const std::string& exchange_name() const {
+    return data_->exchange_name_;
+  }
+  const std::string& show_name() const {
+    return data_->show_name_;
+  }
+
+ private:
+  class Data {
+   public:
+    Data()
+        : refcount_(1),
+          platform_type_(0),
+          exchange_name_("default"){
+    }
+
+    ~Data() {
+    }
+
+   public:
+    int32 platform_type_;
+    std::string platform_name_;
+    std::string symbol_;
+    std::string exchange_name_;
+    std::string show_name_;
+
+    void AddRef() {
+      __sync_fetch_and_add(&refcount_, 1);
+    }
+    void Release() {
+      __sync_fetch_and_sub(&refcount_, 1);
+      if (!refcount_)
+        delete this;
+    }
+
+   private:
+    int refcount_;
+  };
+
+  Data* data_;
+
+};
+
 class Quotations {
  public:
   Quotations();
@@ -25,6 +110,10 @@ class Quotations {
     if (data_ != NULL) {
       data_->Release();
     }
+  }
+
+  void set_platform_name(const std::string& platform) {
+    data_->platform_name_ = platform;
   }
 
   void set_symbol(const std::string& symbol) {
@@ -67,6 +156,9 @@ class Quotations {
     data_->current_unix_time_ = current_unix_time;
   }
 
+  const std::string& platform() const {
+    return data_->platform_name_;
+  }
 
   const std::string& symbol() const {
     return data_->symbol_;
@@ -106,6 +198,9 @@ class Quotations {
   const int64 current_unix_time() const {
     return data_->current_unix_time_;
   }
+
+  std::string ValueSerialize();
+
  private:
   class Data {
    public:
@@ -125,6 +220,7 @@ class Quotations {
     }
 
    public:
+    std::string platform_name_;
     std::string symbol_;
     std::string exchange_name_;
     double current_price_;
