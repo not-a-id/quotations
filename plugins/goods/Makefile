@@ -93,6 +93,12 @@ goods_init.o : ./goods_init.cc ./goods_init.h
 goods_logic.o : ./goods_logic.cc ./goods_logic.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./goods_logic.cc $(INCLUDE_PATHS)
 
+goods_redis.o : ./goods_redis.cc ./goods_redis.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./goods_redis.cc $(INCLUDE_PATHS)
+
+goods_schduler_engine.o : ./goods_schduler_engine.cc ./goods_schduler_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./goods_schduler_engine.cc $(INCLUDE_PATHS)
+
 fx_pull_engine.o : ./fx_pull_engine.cc ./fx_pull_engine.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./fx_pull_engine.cc $(INCLUDE_PATHS)
 
@@ -108,11 +114,28 @@ logic_unit.o :  $(USER_DIR)/logic/logic_unit.cc $(USER_DIR)/logic/logic_unit.h
 quotations_infos.o :  $(USER_DIR)/logic/quotations_infos.cc $(USER_DIR)/logic/quotations_infos.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/quotations_infos.cc $(INCLUDE_PATHS)
 
-http_api.o :  $(USER_DIR)/logic/quotations_infos.cc $(USER_DIR)/logic/quotations_infos.h
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/quotations_infos.cc $(INCLUDE_PATHS)
+data_engine.o :  $(USER_DIR)/storage/data_engine.cc $(USER_DIR)/storage/data_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_engine.cc $(INCLUDE_PATHS)
+	
+data_mysql_engine.o :  $(USER_DIR)/storage/data_mysql_engine.cc $(USER_DIR)/storage/data_mysql_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_mysql_engine.cc $(INCLUDE_PATHS)
+	
+data_redis_engine.o :  $(USER_DIR)/storage/data_redis_engine.cc $(USER_DIR)/storage/data_redis_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_redis_engine.cc $(INCLUDE_PATHS)
+	
+mysql_pool.o :  $(USER_DIR)/storage/mysql_pool.cc $(USER_DIR)/storage/mysql_pool.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/mysql_pool.cc $(INCLUDE_PATHS)
 
-$(PLUGIN) : goods_init.o  goods_logic.o fx_pull_engine.o logic_unit.o quotations_infos.o \
-	jh_pull_engine.o \
+redis_pool.o :  $(USER_DIR)/storage/redis_pool.cc $(USER_DIR)/storage/redis_pool.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/redis_pool.cc $(INCLUDE_PATHS)
+
+http_api.o :  $(USER_DIR)/net/http_api.cc $(USER_DIR)/net/http_api.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/http_api.cc $(INCLUDE_PATHS)
+
+$(PLUGIN) : goods_init.o  goods_logic.o goods_redis.o goods_schduler_engine.o fx_pull_engine.o\
+	jh_pull_engine.o pull_engine.o logic_unit.o quotations_infos.o \
+	redis_pool.o mysql_pool.o data_redis_engine.o data_mysql_engine.o\
+	data_engine.o http_api.o\
 	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lrt -ldl -lmysqlclient \
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lcurl -lrt -ldl -lmysqlclient \
 	$^ -o $@

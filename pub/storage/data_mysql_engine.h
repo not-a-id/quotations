@@ -1,4 +1,4 @@
-//  Copyright (c) 2016-2017 The SWP Authors. All rights reserved.
+//  Copyright (c) 2016-2017 The quotations Authors. All rights reserved.
 //  Created on: 2016年12月30日 Author: kerry
 
 #ifndef DATA_MYSQL_ENGINE_H__

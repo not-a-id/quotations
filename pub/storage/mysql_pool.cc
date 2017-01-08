@@ -45,6 +45,20 @@ void MYSQL_Pool::Init(std::list<base::ConnAddr>& addrlist,
   }
 }
 
+void MYSQL_Pool::Dest() {
+  base_logic::WLockGd lk(db_pool_lock_);
+  while(db_conn_pool_.size()>0){
+    base_storage::DBStorageEngine* engine = db_conn_pool_.front();
+    db_conn_pool_.pop_front();
+    if(engine){
+      engine->Release();
+      delete engine;
+      engine =NULL;
+    }
+  }
+  DeinitThreadrw(db_pool_lock_);
+}
+
 void MYSQL_Pool::DBConnectionPush(base_storage::DBStorageEngine* engine) {
   base_logic::WLockGd lk(db_pool_lock_);
   db_conn_pool_.push_back(engine);
@@ -57,36 +71,23 @@ base_storage::DBStorageEngine* MYSQL_Pool::DBConnectionPop() {
   base_storage::DBStorageEngine* engine = db_conn_pool_.front();
   db_conn_pool_.pop_front();
 
-  if(engine == NULL){
+  if (engine == NULL) {
     LOG_MSG("pop engine null");
     engine = base_storage::DBStorageEngine::Create(base_storage::IMPL_MYSQL);
     engine->Connections(addrlist_);
   }
 
-  if (!engine->CheckConnect()){
+  if (!engine->CheckConnect()) {
     int reconnect = 3;
     do {
       engine->Release();
-      if(engine->Connections(addrlist_))
+      if (engine->Connections(addrlist_))
         break;
       --reconnect;
-    }while (reconnect > 0);
+    } while (reconnect > 0);
   }
   return engine;
 }
 
-void MYSQL_Pool::Dest() {
-  base_logic::WLockGd lk(db_pool_lock_);
-  while (db_conn_pool_.size() > 0) {
-    base_storage::DBStorageEngine* engine = db_conn_pool_.front();
-    db_conn_pool_.pop_front();
-    if (engine) {
-      engine->Release();
-      delete engine;
-      engine = NULL;
-    }
-  }
-  DeinitThreadrw(db_pool_lock_);
-}
 
 }

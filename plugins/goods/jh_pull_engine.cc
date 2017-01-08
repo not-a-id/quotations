@@ -110,10 +110,7 @@ bool JHPullEngine::ParserFXData(const std::string& result,
   quotation->set_opening_today_price(open_price);
   quotation->set_change(updown_price);
 
-  FREE: if (price_dict) {
-    delete price_dict;
-    price_dict = NULL;
-  }
+  FREE:
   if (value) {
     delete value;
     value = NULL;
