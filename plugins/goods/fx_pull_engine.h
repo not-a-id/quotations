@@ -1,4 +1,4 @@
-//  Copyright (c) 2015-2015 The quotations Authors. All rights reserved.
+//  Copyright (c) 2016-2017 The quotations Authors. All rights reserved.
 //  Created on: 2017年1月3日 Author: kerry
 
 #ifndef QUOTATIONS_GOODS_FX_PULL_ENGINE_H_
