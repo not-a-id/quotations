@@ -3,6 +3,10 @@
 
 #include "goods/goods_schduler_engine.h"
 #include "goods/pull_engine.h"
+#include "goods/goods_proto_buf.h"
+#include "net/comm_head.h"
+#include "net/packet_processing.h"
+#include "logic/logic_unit.h"
 
 namespace goods_logic {
 
@@ -40,7 +44,7 @@ void GoodsSchdulerManager::Init() {
 
   quotations_logic::PlatformSymbol fx_ag15_symbol;
   fx_ag15_symbol.set_exchange_name("PMEC");
-  fx_ag15_symbol.set_platform_name("fx");
+  fx_ag15_symbol.set_platform_name("FX");
   fx_ag15_symbol.set_platform_type(FX_TYPE);
   fx_ag15_symbol.set_show_name("现货白银9995");
   fx_ag15_symbol.set_symbol("AG15");
@@ -49,7 +53,7 @@ void GoodsSchdulerManager::Init() {
 
   quotations_logic::PlatformSymbol fx_ag1_symbol;
   fx_ag1_symbol.set_exchange_name("PMEC");
-  fx_ag1_symbol.set_platform_name("fx");
+  fx_ag1_symbol.set_platform_name("FX");
   fx_ag1_symbol.set_platform_type(FX_TYPE);
   fx_ag1_symbol.set_show_name("现货白银9999");
   fx_ag1_symbol.set_symbol("AG1");
@@ -58,7 +62,7 @@ void GoodsSchdulerManager::Init() {
 
   quotations_logic::PlatformSymbol fx_ag30_symbol;
   fx_ag30_symbol.set_exchange_name("TJPME");
-  fx_ag30_symbol.set_platform_name("fx");
+  fx_ag30_symbol.set_platform_name("FX");
   fx_ag30_symbol.set_platform_type(FX_TYPE);
   fx_ag30_symbol.set_show_name("现货白银");
   fx_ag30_symbol.set_symbol("AG30KG");
@@ -66,7 +70,7 @@ void GoodsSchdulerManager::Init() {
 
   quotations_logic::PlatformSymbol fx_xagusd_symbol;
   fx_xagusd_symbol.set_exchange_name("TJPME");
-  fx_xagusd_symbol.set_platform_name("fx");
+  fx_xagusd_symbol.set_platform_name("FX");
   fx_xagusd_symbol.set_platform_type(FX_TYPE);
   fx_xagusd_symbol.set_show_name("现货白银");
   fx_xagusd_symbol.set_symbol("XAGUSD");
@@ -112,7 +116,28 @@ bool GoodsSchdulerManager::AchieveGoodsUnit(
     return false;
   //写入redis
   r = goods_redis_->RealTimeGoodsData((*quotations));
+  SendGoods(quotations);
+
   return r;
+}
+
+void GoodsSchdulerManager::SendGoods(quotations_logic::Quotations* quotations) {
+  struct PacketControl  packet_control;
+  MAKE_HEAD(packet_control, 10001, 1, 0, 0, 0);
+  goods_logic::net_reply::RealTime real_time;
+  real_time.set_change(quotations->change());
+  real_time.set_pchg(quotations->pchg());
+  real_time.set_opening_today_price(quotations->opening_today_price());
+  real_time.set_closed_yesterday_price(quotations->closed_yesterday_price());
+  real_time.set_current_price(quotations->current_price());
+  real_time.set_current_unix_time(quotations->current_unix_time());
+  real_time.set_high_price(quotations->high_price());
+  real_time.set_low_price(quotations->low_price());
+  real_time.set_exchange_name(quotations->exchange_name());
+  real_time.set_platform_name(quotations->platform());
+  real_time.set_symbol(quotations->symbol());
+  packet_control.body_ = real_time.get();
+  send_message(12, &packet_control);
 }
 
 }

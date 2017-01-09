@@ -32,6 +32,8 @@ class GoodsSchdulerManager {
   void TimeAchieveGoods();
   bool AchieveGoodsUnit(const int32 type,
                         quotations_logic::Quotations* quotations);
+
+  void SendGoods(quotations_logic::Quotations* quotations);
  private:
   goods_logic::GoodsRedis *goods_redis_;
   GoodsCache *goods_cache_;

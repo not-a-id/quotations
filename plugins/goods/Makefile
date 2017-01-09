@@ -132,10 +132,13 @@ redis_pool.o :  $(USER_DIR)/storage/redis_pool.cc $(USER_DIR)/storage/redis_pool
 http_api.o :  $(USER_DIR)/net/http_api.cc $(USER_DIR)/net/http_api.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/http_api.cc $(INCLUDE_PATHS)
 
+packet_processing.o :  $(USER_DIR)/net/packet_processing.cc $(USER_DIR)/net/packet_processing.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/packet_processing.cc $(INCLUDE_PATHS)
+
 $(PLUGIN) : goods_init.o  goods_logic.o goods_redis.o goods_schduler_engine.o fx_pull_engine.o\
 	jh_pull_engine.o pull_engine.o logic_unit.o quotations_infos.o \
 	redis_pool.o mysql_pool.o data_redis_engine.o data_mysql_engine.o\
-	data_engine.o http_api.o\
+	data_engine.o http_api.o packet_processing.o\
 	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lcurl -lrt -ldl -lmysqlclient \
 	$^ -o $@
