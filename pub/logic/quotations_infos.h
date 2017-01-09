@@ -13,6 +13,157 @@
 
 namespace quotations_logic {
 
+class ConnectionSchduler {
+ public:
+  ConnectionSchduler();
+
+  ConnectionSchduler(const ConnectionSchduler& connection_schduler);
+
+  ConnectionSchduler& operator =(const ConnectionSchduler& connection_schduler);
+
+  ~ConnectionSchduler() {
+    if (data_ != NULL) {
+      data_->Release();
+    }
+  }
+
+  void set_id(const int32 id){
+    data_->id_ = id;
+  }
+
+  void set_send_error_count(const int32 send_error_count){
+    data_->send_error_count_ = send_error_count;
+  }
+
+  void set_recv_error_count(const int32 recv_error_count) {
+    data_->recv_error_count_ = recv_error_count;
+  }
+
+  void set_socket(const int socket) {
+    data_->socket_ = socket;
+  }
+
+  void set_is_effective(const bool is_effective) {
+    data_->is_effective_ = is_effective;
+  }
+
+  void set_send_last_time(const time_t send_last_time){
+    data_->send_last_time_ = send_last_time;
+  }
+
+  void set_recv_last_time(const time_t recv_last_time) {
+    data_->recv_last_time_ = recv_last_time;
+  }
+
+  void set_ip(const std::string& ip) {
+    data_->ip_ = ip;
+  }
+
+  void set_password(const std::string& password) {
+    data_->password_ = password;
+  }
+
+  void set_mac(const std::string& mac) {
+    data_->mac_ = mac;
+  }
+
+  void add_send_error_count() {
+    __sync_fetch_and_add(&data_->send_error_count_, 1);
+  }
+
+  void add_recv_error_count() {
+    __sync_fetch_and_add(&data_->recv_error_count_, 1);
+  }
+
+  const int32 id() const {
+    return data_->id_;
+  }
+
+  const int32 send_error_count() const {
+    return data_->send_error_count_;
+  }
+
+  const int32 recv_error_count() const {
+    return data_->recv_error_count_;
+  }
+
+  const int socket() const {
+    return data_->socket_;
+  }
+
+  const int port() const {
+    return data_->port_;
+  }
+
+  const bool is_effective() const {
+    return data_->is_effective_;
+  }
+
+  const time_t send_last_time() const {
+    return data_->send_last_time_;
+  }
+
+  const time_t recv_last_time() const {
+    return data_->recv_last_time_;
+  }
+
+  const std::string& ip() const {
+    return data_->ip_;
+  }
+
+  const std::string& password() const {
+    return data_->password_;
+  }
+
+  const std::string& mac() const {
+    return data_->mac_;
+  }
+ private:
+  class Data {
+   public:
+    Data()
+        : refcount_(1),
+          id_(0),
+          send_error_count_(0),
+          recv_error_count_(0),
+          socket_(-1),
+          port_(0),
+          send_last_time_(0),
+          recv_last_time_(0),
+          is_effective_(false) {
+    }
+
+    ~Data() {
+    }
+
+   public:
+    int32 id_;
+    int32 send_error_count_;
+    int32 recv_error_count_;
+    int socket_;
+    int port_;
+    bool is_effective_;
+    time_t send_last_time_;
+    time_t recv_last_time_;
+    std::string ip_;
+    std::string password_;
+    std::string mac_;
+    void AddRef() {
+      __sync_fetch_and_add(&refcount_, 1);
+    }
+    void Release() {
+      __sync_fetch_and_sub(&refcount_, 1);
+      if (!refcount_)
+        delete this;
+    }
+
+   private:
+    int refcount_;
+  };
+
+  Data* data_;
+};
+
 class PlatformSymbol {
  public:
   PlatformSymbol();
@@ -68,7 +219,7 @@ class PlatformSymbol {
     Data()
         : refcount_(1),
           platform_type_(0),
-          exchange_name_("default"){
+          exchange_name_("DEFAULT") {
     }
 
     ~Data() {

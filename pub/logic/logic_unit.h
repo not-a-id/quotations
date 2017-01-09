@@ -17,6 +17,24 @@
 
 namespace logic {
 
+class SendUtils {
+ public:
+  SendUtils();
+  virtual ~SendUtils();
+ private:
+  static SendUtils*  instance_;
+ public:
+  static SendUtils* GetInstance();
+  static void FreeInstance();
+
+ public:
+  int32 SendFull(int socket, const char* buffer, size_t bytes);
+  bool SendBytes(int socket, const void* bytes, int32 len, const char* file, int32 line);
+  bool SendMessage(int socket, struct PacketHead* packet, const char* file, int32 line);
+ private:
+  struct threadrw_t* socket_lock_;
+};
+
 class BaseValue {
  public:
   static base_logic::Value* Deserialize(std::string* str);
@@ -114,4 +132,11 @@ class SomeUtils {
 };
 
 }
+
+#define send_message(socket, packet) \
+  logic::SendUtils::GetInstance()->SendMessage(socket, packet, __FILE__, __LINE__)\
+
+
+#define closelockconnect(socket) \
+    shutdown(socket, SHUT_RDWR);
 #endif /* LOGIC_UNIT_H_ */

@@ -7,6 +7,32 @@
 
 namespace quotations_logic {
 
+ConnectionSchduler::ConnectionSchduler() {
+  data_ = new Data();
+}
+
+ConnectionSchduler::ConnectionSchduler(const ConnectionSchduler& connection_schduler)
+    : data_(connection_schduler.data_) {
+  if (data_ != NULL) {
+    data_->AddRef();
+  }
+}
+
+ConnectionSchduler& ConnectionSchduler::operator =(const ConnectionSchduler& connection_schduler) {
+  if (connection_schduler.data_ != NULL) {
+    connection_schduler.data_->AddRef();
+  }
+
+  if (data_ != NULL) {
+    data_->Release();
+  }
+
+  data_ = connection_schduler.data_;
+  return (*this);
+}
+
+
+
 PlatformSymbol::PlatformSymbol() {
   data_ = new Data();
 }
