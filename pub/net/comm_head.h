@@ -11,7 +11,14 @@
 #include "logic/base_values.h"
 
 
-enum  PRS {
+enum PACKET_TYPE {
+  ERROR_TYPE = 0,
+  GOODS_TYPE = 1,
+  USER_TYPE = 2
+};
+
+
+enum PRS {
     NOZIP_AND_NOENCRYPT = 0,
     ZIP_AND_NOENCRYPT = 1,
     NOZIP_AND_ENCRYPT = 2,
