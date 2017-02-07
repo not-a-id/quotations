@@ -13,6 +13,14 @@
 
 namespace quotations_logic {
 
+enum QUOTATIONS_TYPE {
+  NO_TYPE = -1,
+  STOCK_TYPE =1,
+  GOOD_TYPE = 2,
+  FUTURES_TYPE = 3,
+  FOREX_TYPE = 4
+};
+
 class ConnectionSchduler {
  public:
   ConnectionSchduler();
@@ -29,6 +37,10 @@ class ConnectionSchduler {
 
   void set_id(const int32 id){
     data_->id_ = id;
+  }
+
+  void set_type(const int32 type){
+    data_->type_ = type;
   }
 
   void set_send_error_count(const int32 send_error_count){
@@ -79,6 +91,10 @@ class ConnectionSchduler {
     return data_->id_;
   }
 
+  const int32 type() const {
+    return data_->type_;
+  }
+
   const int32 send_error_count() const {
     return data_->send_error_count_;
   }
@@ -124,6 +140,7 @@ class ConnectionSchduler {
     Data()
         : refcount_(1),
           id_(0),
+          type_(0),
           send_error_count_(0),
           recv_error_count_(0),
           socket_(-1),
@@ -138,6 +155,7 @@ class ConnectionSchduler {
 
    public:
     int32 id_;
+    int32 type_;
     int32 send_error_count_;
     int32 recv_error_count_;
     int socket_;
