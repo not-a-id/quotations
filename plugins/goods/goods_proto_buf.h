@@ -1,8 +1,8 @@
 //  Copyright (c) 2015-2015 The quotations Authors. All rights reserved.
 //  Created on: 2017年1月8日 Author: kerry
 
-#ifndef QUOTATIONS_GOODS_GOODS_LOGIC_
-#define QUOTATIONS_GOODS_GOODS_LOGIC_
+#ifndef QUOTATIONS_GOODS_GOODS_PROTO_BUF_H_
+#define QUOTATIONS_GOODS_GOODS_PROTO_BUF_H_
 
 #include "basic/basictypes.h"
 #include "logic/base_values.h"
@@ -29,6 +29,7 @@ class RealTime {
         exchange_name_(NULL),
         platform_name_(NULL),
         symbol_(NULL),
+        type_(NULL),
         value_(NULL) {
   }
 
@@ -78,6 +79,10 @@ class RealTime {
     symbol_ = new base_logic::StringValue(symbol);
   }
 
+  void set_type(const int32 type) {
+    type_ = new base_logic::FundamentalValue(type);
+  }
+
   ~RealTime() {
     if (value_) {
       delete value_;
@@ -90,22 +95,24 @@ class RealTime {
       value_->Set(L"change", change_);
     if (pchg_ != NULL)
       value_->Set(L"pchg", pchg_);
+    if (type_ != NULL)
+      value_->Set(L"type", type_);
     if (opening_today_price_ != NULL)
-      value_->Set(L"opening_today_price", opening_today_price_);
+      value_->Set(L"openingTodayPrice", opening_today_price_);
     if (closed_yesterday_price_ != NULL)
-      value_->Set(L"closed_yesterday_price", closed_yesterday_price_);
+      value_->Set(L"closedYesterdayPrice", closed_yesterday_price_);
     if (current_price_ != NULL)
-      value_->Set(L"current_price", current_price_);
+      value_->Set(L"currentPrice", current_price_);
     if (current_unix_time_ != NULL)
-      value_->Set(L"current_unix_time", current_unix_time_);
+      value_->Set(L"priceTime", current_unix_time_);
     if (high_price_ != NULL)
-      value_->Set(L"high_price", high_price_);
+      value_->Set(L"highPrice", high_price_);
     if (low_price_ != NULL)
-      value_->Set(L"low_price", low_price_);
+      value_->Set(L"lowPrice", low_price_);
     if (exchange_name_ != NULL)
-      value_->Set(L"exchange_name", exchange_name_);
+      value_->Set(L"exchangeName", exchange_name_);
     if (platform_name_ != NULL)
-      value_->Set(L"platform_name", platform_name_);
+      value_->Set(L"platformName", platform_name_);
     if (symbol_ != NULL)
       value_->Set(L"symbol", symbol_);
     return value_;
@@ -119,6 +126,7 @@ class RealTime {
   base_logic::FundamentalValue* current_unix_time_;
   base_logic::FundamentalValue* high_price_;
   base_logic::FundamentalValue* low_price_;
+  base_logic::FundamentalValue* type_;
   base_logic::StringValue* exchange_name_;
   base_logic::StringValue* platform_name_;
   base_logic::StringValue* symbol_;

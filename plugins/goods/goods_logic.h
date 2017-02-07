@@ -12,21 +12,21 @@
 namespace goods_logic {
 
 class Goodslogic {
-public:
+ public:
   Goodslogic();
   virtual ~Goodslogic();
 
-private:
+ private:
   static Goodslogic *instance_;
 
-public:
+ public:
   static Goodslogic *GetInstance();
   static void FreeInstance();
 
   bool OnGoodsConnect(struct server *srv, const int socket);
 
   bool OnGoodsMessage(struct server *srv, const int socket, const void *msg,
-                       const int len);
+                      const int len);
 
   bool OnGoodsClose(struct server *srv, const int socket);
 
@@ -42,12 +42,12 @@ public:
 
   bool OnTimeout(struct server *srv, char *id, int opcode, int time);
 
-private:
+ private:
   bool Init();
-private:
-  goods_logic::GoodsRedis*    goods_redis_;
-  goods_logic::GoodsSchdulerManager*  goods_schduler_;
+ private:
+  goods_logic::GoodsRedis* goods_redis_;
+  goods_logic::GoodsSchdulerManager* goods_schduler_;
 };
-} // namespace goods_logic
+}  // namespace goods_logic
 
 #endif

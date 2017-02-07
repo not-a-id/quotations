@@ -6,6 +6,7 @@
 
 #include "logic/quotations_infos.h"
 #include "goods/goods_redis.h"
+#include "schduler/schduler_engine.h"
 #include "thread/base_thread_handler.h"
 #include "thread/base_thread_lock.h"
 
@@ -36,6 +37,7 @@ class GoodsSchdulerManager {
   void SendGoods(quotations_logic::Quotations* quotations);
  private:
   goods_logic::GoodsRedis *goods_redis_;
+  quotations_schduler::SchdulerEngine* schduler_engine_;
   GoodsCache *goods_cache_;
   struct threadrw_t *lock_;
 };

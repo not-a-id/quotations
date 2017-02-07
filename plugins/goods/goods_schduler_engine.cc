@@ -22,12 +22,28 @@ GoodsSchdulerManager::GoodsSchdulerManager()
 GoodsSchdulerManager::~GoodsSchdulerManager() {
   DeinitThreadrw(lock_);
   goods_cache_->symbol_list_.clear();
-  if (goods_cache_) {delete goods_cache_; goods_cache_ = NULL;}
+  if (goods_cache_) {
+    delete goods_cache_;
+    goods_cache_ = NULL;
+  }
 
 }
 
 void GoodsSchdulerManager::Init() {
   InitThreadrw(&lock_);
+
+  bool r = false;
+  quotations_schduler::SchdulerEngine* (*schduler_engine)(void);
+
+  std::string schduler_library = "./connection_schduler/connection_schduler.so";
+  std::string schduler_func = "GetConnectionSchdulerEngine";
+  schduler_engine = (quotations_schduler::SchdulerEngine* (*)(void))
+  logic::SomeUtils::GetLibraryFunction(
+  schduler_library, schduler_func);schduler_engine_
+  = (*schduler_engine)();
+  if (schduler_engine_ == NULL)
+    assert(0);
+
   quotations_logic::PlatformSymbol jh_ag_symbol;
   jh_ag_symbol.set_platform_type(JH_TYPE);
   jh_ag_symbol.set_platform_name("JH");
@@ -42,14 +58,42 @@ void GoodsSchdulerManager::Init() {
   jh_co_symbol.set_symbol("CO");
   goods_cache_->symbol_list_.push_back(jh_co_symbol);
 
+  quotations_logic::PlatformSymbol jh_cu_symbol;
+  jh_cu_symbol.set_platform_type(JH_TYPE);
+  jh_cu_symbol.set_platform_name("JH");
+  jh_cu_symbol.set_show_name("CU");
+  jh_cu_symbol.set_symbol("CU");
+  goods_cache_->symbol_list_.push_back(jh_cu_symbol);
+
+  quotations_logic::PlatformSymbol jh_sa_symbol;
+  jh_sa_symbol.set_platform_type(JH_TYPE);
+  jh_sa_symbol.set_platform_name("JH");
+  jh_sa_symbol.set_show_name("SA");
+  jh_sa_symbol.set_symbol("SA");
+  goods_cache_->symbol_list_.push_back(jh_sa_symbol);
+
+  quotations_logic::PlatformSymbol jh_kc_symbol;
+  jh_kc_symbol.set_platform_type(JH_TYPE);
+  jh_kc_symbol.set_platform_name("JH");
+  jh_kc_symbol.set_show_name("KC");
+  jh_kc_symbol.set_symbol("KC");
+  goods_cache_->symbol_list_.push_back(jh_kc_symbol);
+
+  quotations_logic::PlatformSymbol jh_ng_symbol;
+  jh_ng_symbol.set_platform_type(JH_TYPE);
+  jh_ng_symbol.set_platform_name("JH");
+  jh_ng_symbol.set_show_name("NG");
+  jh_ng_symbol.set_symbol("NG");
+  goods_cache_->symbol_list_.push_back(jh_ng_symbol);
+
+
   quotations_logic::PlatformSymbol fx_ag15_symbol;
   fx_ag15_symbol.set_exchange_name("PMEC");
   fx_ag15_symbol.set_platform_name("FX");
   fx_ag15_symbol.set_platform_type(FX_TYPE);
   fx_ag15_symbol.set_show_name("现货白银9995");
   fx_ag15_symbol.set_symbol("AG15");
-  goods_cache_->symbol_list_.push_back(fx_ag15_symbol);
-
+  //goods_cache_->symbol_list_.push_back(fx_ag15_symbol);
 
   quotations_logic::PlatformSymbol fx_ag1_symbol;
   fx_ag1_symbol.set_exchange_name("PMEC");
@@ -57,8 +101,7 @@ void GoodsSchdulerManager::Init() {
   fx_ag1_symbol.set_platform_type(FX_TYPE);
   fx_ag1_symbol.set_show_name("现货白银9999");
   fx_ag1_symbol.set_symbol("AG1");
-  goods_cache_->symbol_list_.push_back(fx_ag1_symbol);
-
+  //goods_cache_->symbol_list_.push_back(fx_ag1_symbol);
 
   quotations_logic::PlatformSymbol fx_ag30_symbol;
   fx_ag30_symbol.set_exchange_name("TJPME");
@@ -66,7 +109,7 @@ void GoodsSchdulerManager::Init() {
   fx_ag30_symbol.set_platform_type(FX_TYPE);
   fx_ag30_symbol.set_show_name("现货白银");
   fx_ag30_symbol.set_symbol("AG30KG");
-  goods_cache_->symbol_list_.push_back(fx_ag30_symbol);
+  //goods_cache_->symbol_list_.push_back(fx_ag30_symbol);
 
   quotations_logic::PlatformSymbol fx_xagusd_symbol;
   fx_xagusd_symbol.set_exchange_name("TJPME");
@@ -74,7 +117,7 @@ void GoodsSchdulerManager::Init() {
   fx_xagusd_symbol.set_platform_type(FX_TYPE);
   fx_xagusd_symbol.set_show_name("现货白银");
   fx_xagusd_symbol.set_symbol("XAGUSD");
-  goods_cache_->symbol_list_.push_back(fx_xagusd_symbol);
+  //goods_cache_->symbol_list_.push_back(fx_xagusd_symbol);
 
 }
 
@@ -110,20 +153,20 @@ bool GoodsSchdulerManager::AchieveGoodsUnit(
     const int32 type, quotations_logic::Quotations* quotations) {
   bool r = false;
   goods_logic::PullEngine* engine = goods_logic::PullEngine::Create(type);
-  r =  engine->RequestData(quotations->exchange_name(), quotations->symbol(),
-                             quotations);
+  r = engine->RequestData(quotations->exchange_name(), quotations->symbol(),
+                          quotations);
   if (!r)
     return false;
   //写入redis
   r = goods_redis_->RealTimeGoodsData((*quotations));
   SendGoods(quotations);
-
   return r;
 }
 
 void GoodsSchdulerManager::SendGoods(quotations_logic::Quotations* quotations) {
-  struct PacketControl  packet_control;
-  MAKE_HEAD(packet_control, 10001, 1, 0, 0, 0);
+  int32 type = quotations_logic::GOOD_TYPE;
+  struct PacketControl packet_control;
+  MAKE_HEAD(packet_control, 1001, 1, 0, 0, 0);
   goods_logic::net_reply::RealTime real_time;
   real_time.set_change(quotations->change());
   real_time.set_pchg(quotations->pchg());
@@ -133,11 +176,12 @@ void GoodsSchdulerManager::SendGoods(quotations_logic::Quotations* quotations) {
   real_time.set_current_unix_time(quotations->current_unix_time());
   real_time.set_high_price(quotations->high_price());
   real_time.set_low_price(quotations->low_price());
+  real_time.set_type(type);
   real_time.set_exchange_name(quotations->exchange_name());
   real_time.set_platform_name(quotations->platform());
   real_time.set_symbol(quotations->symbol());
   packet_control.body_ = real_time.get();
-  send_message(12, &packet_control);
+  schduler_engine_->SendAllQuotations(&packet_control, 0);
 }
 
 }
