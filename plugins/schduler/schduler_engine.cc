@@ -2,6 +2,7 @@
 //  Created on: 2017年1月8日 Author: kerry
 
 #include"schduler/schduler_engine.h"
+#include "net/comm_head.h"
 #include "logic/logic_comm.h"
 #include "logic/logic_unit.h"
 #include "basic/template.h"
@@ -63,7 +64,6 @@ bool SchdulerEngineImpl::CheckHeartPacket() {
   return schduler_mgr->CheckHeartPacket();
 }
 
-
 bool SchdulerEngineImpl::SetSendErrorCount(const int socket) {
   ConnectionSchdulerManager* schduler_mgr =
       ConnectionSchdulerEngine::GetSchdulerManager();
@@ -74,6 +74,19 @@ bool SchdulerEngineImpl::SetRecvErrorCount(const int socket) {
   ConnectionSchdulerManager* schduler_mgr =
       ConnectionSchdulerEngine::GetSchdulerManager();
   return schduler_mgr->SetRecvErrorCount(socket);
+}
+
+int32 SchdulerEngineImpl::SendAllQuotations(const void* data, const int32 len,
+                                            const int32 type) {
+  ConnectionSchdulerManager* schduler_mgr =
+       ConnectionSchdulerEngine::GetSchdulerManager();
+   return schduler_mgr->SendAllQuotations(data, len, type);
+}
+
+int32 SchdulerEngineImpl::SendAllQuotations(const void* data, const int32 len) {
+  ConnectionSchdulerManager* schduler_mgr =
+      ConnectionSchdulerEngine::GetSchdulerManager();
+  return schduler_mgr->SendAllQuotations(data, len);
 }
 
 ConnectionSchdulerManager* ConnectionSchdulerEngine::schduler_mgr_ = NULL;
@@ -186,6 +199,36 @@ bool ConnectionSchdulerManager::SetRecvErrorCount(int socket) {
       schduler_cache_->socket_map_[socket];
   schduler.add_recv_error_count();
   return true;
+}
+
+int32 ConnectionSchdulerManager::SendAllQuotations(const void* data,
+                                                   const int32 len,
+                                                   const int32 type) {
+  base_logic::WLockGd lk(lock_);
+
+  SCHDULER_MAP::iterator it = schduler_cache_->schduler_map_.begin();
+  for (; it != schduler_cache_->schduler_map_.end(); it++) {
+    quotations_logic::ConnectionSchduler& schduler = it->second;
+    if (!schduler.is_effective())
+      continue;
+    if (schduler.id() == 0
+        || (type != schduler.type() && (type != quotations_logic::NO_TYPE)))
+      continue;
+    struct PacketHead* packet = (struct PacketHead*) data;
+    if (!send_message(schduler.socket(), packet)) {
+      schduler.add_send_error_count();
+      schduler.set_is_effective(false);
+      LOG_MSG2("schduler.socket()=%d,error msg=%s", (int) schduler.socket(),
+          strerror(errno));
+      continue;
+    }
+  }
+  return 0;
+}
+
+int32 ConnectionSchdulerManager::SendAllQuotations(const void* data,
+                                                   const int32 len) {
+  return SendAllQuotations(data, len, quotations_logic::NO_TYPE);
 }
 
 bool ConnectionSchdulerManager::CheckHeartPacket() {

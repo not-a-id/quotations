@@ -38,6 +38,11 @@ class SchdulerEngine {
   virtual bool SetSendErrorCount(int socket) = 0;
 
   virtual bool SetRecvErrorCount(int socket) = 0;
+
+  virtual int32 SendAllQuotations(const void* data, const int32 len) = 0;
+
+  virtual int32 SendAllQuotations(const void* data, const int32 len,
+                                  const int32 type) = 0;
 };
 
 class SchdulerEngineImpl : public SchdulerEngine {
@@ -64,6 +69,10 @@ class SchdulerEngineImpl : public SchdulerEngine {
   bool SetSendErrorCount(int socket);
 
   bool SetRecvErrorCount(int socket);
+
+  int32 SendAllQuotations(const void* data, const int32 len);
+
+  int32 SendAllQuotations(const void* data, const int32 len, const int32 type);
 };
 
 class SchdulerCache {
@@ -73,7 +82,7 @@ class SchdulerCache {
 };
 
 __attribute__((visibility("default")))
- class ConnectionSchdulerManager {
+   class ConnectionSchdulerManager {
  public:
   ConnectionSchdulerManager();
   virtual ~ConnectionSchdulerManager();
@@ -101,6 +110,10 @@ __attribute__((visibility("default")))
 
   bool SetRecvErrorCount(int socket);
 
+  int32 SendAllQuotations(const void* data, const int32 len);
+
+  int32 SendAllQuotations(const void* data, const int32 len, const int32 type);
+
  private:
   void Init();
 
@@ -125,7 +138,7 @@ class ConnectionSchdulerEngine {
   }
  public:
   __attribute__((visibility("default")))
-       static ConnectionSchdulerManager* GetSchdulerManager() {
+         static ConnectionSchdulerManager* GetSchdulerManager() {
     if (schduler_mgr_ == NULL)
       schduler_mgr_ = new ConnectionSchdulerManager();
     return schduler_mgr_;
