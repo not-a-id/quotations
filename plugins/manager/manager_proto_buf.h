@@ -15,7 +15,8 @@ class Login {
  public:
   Login()
    :aid_(NULL)
-   ,password_(NULL){
+   ,password_(NULL)
+   ,a_type_(NULL){
   }
 
   ~Login() {
@@ -32,6 +33,10 @@ class Login {
   void set_password(const std::string& password) { password_ =
     new base_logic::StringValue(password);}
 
+  void set_atype(const int32 type) {
+    a_type_ = new base_logic::FundamentalValue(type);
+  }
+
 
   const int64 aid() const {
     int64 aid = 0;
@@ -45,10 +50,17 @@ class Login {
     return password;
   }
 
+  const int32 a_type() const {
+    int32 a_type;
+    a_type_->GetAsInteger(&a_type);
+    return a_type;
+  }
+
 
  public:
   base_logic::FundamentalValue*     aid_;
   base_logic::StringValue*          password_;
+  base_logic::FundamentalValue*     a_type_;
 };
 }
 

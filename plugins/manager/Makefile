@@ -96,8 +96,36 @@ manager_logic.o : ./manager_logic.cc ./manager_logic.h
 manager_proto_buf.o : ./manager_proto_buf.cc ./manager_proto_buf.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./manager_proto_buf.cc $(INCLUDE_PATHS)
 
+logic_unit.o :  $(USER_DIR)/logic/logic_unit.cc $(USER_DIR)/logic/logic_unit.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/logic_unit.cc $(INCLUDE_PATHS)
+	
+quotations_infos.o :  $(USER_DIR)/logic/quotations_infos.cc $(USER_DIR)/logic/quotations_infos.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/logic/quotations_infos.cc $(INCLUDE_PATHS)
 
-$(PLUGIN) : manager_init.o  manager_logic.o manager_proto_buf.o\
+data_engine.o :  $(USER_DIR)/storage/data_engine.cc $(USER_DIR)/storage/data_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_engine.cc $(INCLUDE_PATHS)
+	
+data_mysql_engine.o :  $(USER_DIR)/storage/data_mysql_engine.cc $(USER_DIR)/storage/data_mysql_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_mysql_engine.cc $(INCLUDE_PATHS)
+	
+data_redis_engine.o :  $(USER_DIR)/storage/data_redis_engine.cc $(USER_DIR)/storage/data_redis_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/data_redis_engine.cc $(INCLUDE_PATHS)
+	
+mysql_pool.o :  $(USER_DIR)/storage/mysql_pool.cc $(USER_DIR)/storage/mysql_pool.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/mysql_pool.cc $(INCLUDE_PATHS)
+
+redis_pool.o :  $(USER_DIR)/storage/redis_pool.cc $(USER_DIR)/storage/redis_pool.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/storage/redis_pool.cc $(INCLUDE_PATHS)
+
+http_api.o :  $(USER_DIR)/net/http_api.cc $(USER_DIR)/net/http_api.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/http_api.cc $(INCLUDE_PATHS)
+
+packet_processing.o :  $(USER_DIR)/net/packet_processing.cc $(USER_DIR)/net/packet_processing.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/packet_processing.cc $(INCLUDE_PATHS)
+
+
+$(PLUGIN) : manager_init.o  manager_logic.o manager_proto_buf.o logic_unit.o quotations_infos.o\
+	data_engine.o data_mysql_engine.o data_redis_engine.o mysql_pool.o redis_pool.o packet_processing.o\
 	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lrt -ldl -lmysqlclient \
 	$^ -o $@

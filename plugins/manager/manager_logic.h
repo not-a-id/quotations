@@ -9,6 +9,7 @@
 #include "basic/basictypes.h"
 #include "net/comm_head.h"
 #include "net/packet_processing.h"
+#include "schduler/schduler_engine.h"
 
 namespace manager_logic {
 
@@ -46,6 +47,8 @@ class Managerlogic {
   bool OnApplicationReg(struct server* srv, int socket, struct PacketHead *packet);
  private:
   bool Init();
+ private:
+  quotations_schduler::SchdulerEngine* schduler_engine_;
   //scoped_ptr<manager_logic::ManagerDB>    manager_db_;
   //crawler_schduler::SchdulerEngine*       crawler_schduler_engine_;
   //scoped_ptr<base_logic::DataControllerEngine>          redis_engine_;

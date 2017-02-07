@@ -28,11 +28,21 @@ Managerlogic::~Managerlogic() {
 
 bool Managerlogic::Init() {
   bool r = false;
+  quotations_schduler::SchdulerEngine* (*schduler_engine)(void);
   std::string path = DEFAULT_CONFIG_PATH;
   config::FileConfig *config = config::FileConfig::GetFileConfig();
   if (config == NULL)
     return false;
   r = config->LoadConfig(path);
+
+  std::string schduler_library = "./connection_schduler/connection_schduler.so";
+  std::string schduler_func = "GetConnectionSchdulerEngine";
+  schduler_engine = (quotations_schduler::SchdulerEngine* (*)(void))
+  logic::SomeUtils::GetLibraryFunction(
+  schduler_library, schduler_func);schduler_engine_
+  = (*schduler_engine)();
+  if (schduler_engine_ == NULL)
+    assert(0);
   return true;
 }
 
@@ -65,8 +75,8 @@ bool Managerlogic::OnManagerMessage(struct server *srv, const int socket,
 
   assert(packet);
 
-  switch (packet->type) {
-    case USER_APPLICATION_LOGIN:{
+  switch (packet->operate_code) {
+    case USER_APPLICATION_LOGIN: {
       OnApplicationReg(srv, socket, packet);
       break;
     }
@@ -77,6 +87,7 @@ bool Managerlogic::OnManagerMessage(struct server *srv, const int socket,
 }
 
 bool Managerlogic::OnManagerClose(struct server *srv, const int socket) {
+  schduler_engine_->CloseConnectionSchduler(socket);
   return true;
 }
 
@@ -115,10 +126,22 @@ bool Managerlogic::OnTimeout(struct server *srv, char *id, int opcode,
 
 bool Managerlogic::OnApplicationReg(struct server* srv, int socket,
                                     struct PacketHead *packet) {
-
-  struct PacketControl* packet_control = (struct PacketControl*)(packet);
+  struct PacketControl* packet_control = (struct PacketControl*) (packet);
   manager_logic::net_request::Login request_login;
   request_login.set_http_packet(packet_control->body_);
+  std::string ip;
+  int port;
+  logic::SomeUtils::GetIPAddress(socket, ip, port);
+  quotations_logic::ConnectionSchduler scheduler;
+  scheduler.set_id(request_login.aid());
+  scheduler.set_ip(ip);
+  scheduler.set_is_effective(true);
+  scheduler.set_socket(socket);
+  scheduler.set_type(request_login.a_type());
+  scheduler.set_password(request_login.password());
+  schduler_engine_->SetConnectionSchduler(request_login.aid(), &scheduler);
+  LOG_DEBUG2("ip:{%s} port:{%d} aid:{%ld} password:{%s}",
+      ip.c_str(), port, request_login.aid(), request_login.password().c_str());
   return true;
 
 }
