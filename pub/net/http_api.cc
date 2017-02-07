@@ -23,7 +23,10 @@ bool HTTPAPI::RequestGetMethod(const std::string& url,
     return r;
   }
   std::string query = url + std::string("?") + params;
+  //std::string query = "http://idcardreturnphoto.haoservice.com/idcard/VerifyIdcardReturnPhoto?cardNo=13032119880401018&realName=%E5%BC%A0%E5%BC%BA";
+  //std::string authorization = "Authorization:APPCODE 900036feeee64ae089177dd06b25faa9";
   http::HttpMethodGet http(query);
+  //http.SetHeaders(authorization);
   int32 i = 0;
   do {
     r = http.Get();

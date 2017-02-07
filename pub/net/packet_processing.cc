@@ -65,7 +65,8 @@ bool PacketProsess::UnpackStream(const void *packet_stream, int32 len,
 
   struct PacketControl *packet_control = new struct PacketControl;
   FILLPACKET();
-  return r;
+  (*packet_head) = (struct PacketHead*)(packet_control);
+  return true;
 }
 
 void PacketProsess::DeletePacket(const void *packet_stream, int32 len,
