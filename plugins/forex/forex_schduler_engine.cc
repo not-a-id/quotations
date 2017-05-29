@@ -57,22 +57,6 @@ void ForexSchdulerManager::InitForexSymbol() {
   sina_usdcnh.set_symbol("fx_susdcnh");
   forex_cache_->symbol_list_.push_back(sina_usdcnh);
 
-  quotations_logic::PlatformSymbol sina_usdcny;
-  sina_usdcny.set_platform_type(SINA_TYPE);
-  sina_usdcny.set_platform_name("SINA");
-  sina_usdcny.set_exchange_name("SINA");
-  sina_usdcny.set_show_name("美元人民币(在岸)");
-  sina_usdcny.set_symbol("fx_susdcny");
-  //forex_cache_->symbol_list_.push_back(sina_usdcny);
-
-  quotations_logic::PlatformSymbol sina_eurcny;
-  sina_eurcny.set_platform_type(SINA_TYPE);
-  sina_eurcny.set_platform_name("SINA");
-  sina_eurcny.set_exchange_name("SINA");
-  sina_eurcny.set_show_name("欧元人民币(在岸)");
-  sina_eurcny.set_symbol("fx_seurcny");
-  //forex_cache_->symbol_list_.push_back(sina_eurcny);
-
   quotations_logic::PlatformSymbol sina_eurcnh;
   sina_eurcnh.set_platform_type(SINA_TYPE);
   sina_eurcnh.set_platform_name("SINA");
@@ -80,14 +64,6 @@ void ForexSchdulerManager::InitForexSymbol() {
   sina_eurcnh.set_show_name("欧元人民币(离岸)");
   sina_eurcnh.set_symbol("fx_seurcnh");
   forex_cache_->symbol_list_.push_back(sina_eurcnh);
-
-  quotations_logic::PlatformSymbol sina_jpycny;
-  sina_jpycny.set_platform_type(SINA_TYPE);
-  sina_jpycny.set_platform_name("SINA");
-  sina_jpycny.set_exchange_name("SINA");
-  sina_jpycny.set_show_name("日元人民币(在岸)");
-  sina_jpycny.set_symbol("fx_sjpycny");
-  //forex_cache_->symbol_list_.push_back(sina_jpycny);
 
   quotations_logic::PlatformSymbol sina_jpycnh;
   sina_jpycnh.set_platform_type(SINA_TYPE);

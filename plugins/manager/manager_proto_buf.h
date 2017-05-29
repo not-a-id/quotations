@@ -24,7 +24,7 @@ class Login {
     if (password_) {delete password_; password_ = NULL;}
   }
 
-  void set_http_packet(base_logic::DictionaryValue* value);
+  bool set_http_packet(base_logic::DictionaryValue* value);
 
 
   void set_aid(const int64 aid) { aid_ =

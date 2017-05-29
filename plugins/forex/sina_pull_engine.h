@@ -23,8 +23,8 @@ enum ELETYPE{
   ELEL_UNKOWN_TOW = 8,
   NAME = 9,
   PCHG = 10,
-  CHANGE_PRICE = 12,
-  SWING = 13 ,
+  CHANGE_PRICE = 11,
+  SWING = 12 ,
   ADDRESS = 14,
   CURRENT_DATE = 17
 };
