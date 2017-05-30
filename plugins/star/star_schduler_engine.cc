@@ -2,12 +2,11 @@
 //  Created on: 2017年1月7日 Author: kerry
 
 #include "star/star_schduler_engine.h"
-#include "star/pull_engine.h"
 #include "net/comm_head.h"
 #include "net/packet_processing.h"
 #include "net/quotations_proto.h"
 #include "logic/logic_unit.h"
-
+#include <list>
 namespace star_logic {
 
 StarSchdulerManager* StarSchdulerEngine::schduler_mgr_ = NULL;
@@ -54,9 +53,13 @@ void StarSchdulerManager::InitRedis(star_logic::StarRedis* star_redis) {
   star_redis_ = star_redis;
 }
 
+void StarSchdulerManager::InitKafka(star_logic::StarKafka* star_kafka) {
+  star_kafka_ = star_kafka;
+}
+
 void StarSchdulerManager::TimeEvent(int opcode, int time) {
   switch (opcode) {
-    case UPDATE_FOREX_DATA: {
+    case UPDATE_STAR_DATA: {
       TimeAchieveStar();
       break;
     }
@@ -66,7 +69,15 @@ void StarSchdulerManager::TimeEvent(int opcode, int time) {
 }
 
 void StarSchdulerManager::TimeAchieveStar() {
-  /*bool r = false;
+ 
+ std::list<quotations_logic::Quotations> quotations_list;
+ star_kafka_->FectchBatchTempTask(&quotations_list);
+ while (quotations_list.size() > 0) {
+   quotations_logic::Quotations quotation = quotations_list.front();
+   quotations_list.pop_front();
+   AchieveStarUnit(5,&quotation);
+ }
+ /*bool r = false;
   base_logic::RLockGd lk(lock_);
   PLATFORM_SYMBOL_LIST::iterator it = star_cache_->symbol_list_.begin();
   for (; it != star_cache_->symbol_list_.end(); ++it) {
@@ -81,7 +92,10 @@ void StarSchdulerManager::TimeAchieveStar() {
 
 bool StarSchdulerManager::AchieveStarUnit(
     const int32 type, quotations_logic::Quotations* quotations) {
- /* bool r = false;
+    bool r = star_redis_->RealTimeStarData((*quotations));
+    SendStar(quotations);
+    return true;
+  /* bool r = false;
   star_logic::PullEngine* engine = star_logic::PullEngine::Create(type);
   r = engine->RequestData(quotations->exchange_name(), quotations->symbol(),
                           quotations);

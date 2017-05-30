@@ -83,6 +83,18 @@ Quotations& Quotations::operator =(const Quotations& quotations) {
   return (*this);
 }
 
+void Quotations::Derialization(base_logic::DictionaryValue* dict) {
+   dict->GetReal(L"current_price", &data_->current_price_);
+   dict->GetReal(L"high_price", &data_->high_price_);
+   dict->GetReal(L"low_price", &data_->low_price_);
+   dict->GetReal(L"opening_today_price", &data_->opening_today_price_);
+   dict->GetReal(L"closed_yesterday_price", &data_->closed_yesterday_price_);
+   dict->GetReal(L"change", &data_->change_);
+   dict->GetReal(L"pchg", &data_->pchg_);
+   dict->GetBigInteger(L"current_unix_time", &data_->current_unix_time_);
+   dict->GetString(L"symbol", &data_->symbol_);
+}
+
 std::string Quotations::ValueSerialize() {
   std::string json_content;
   base_logic::DictionaryValue dict;

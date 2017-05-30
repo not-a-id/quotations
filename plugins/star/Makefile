@@ -18,7 +18,7 @@ THIRD_PATH = $(LIB_DIR)/mylib/public
 
 CUSTOM_THIRD_PATH = $(LIB_DIR)/mylib/third_party
 
-LINK_PATHS = -L./ -L/usr/local/libmemcached-1.0.7/lib/  -L/usr/lib64/mysql
+LINK_PATHS = -L./ -L/usr/local/libmemcached-1.0.7/lib/  -L/usr/lib64/mysql -L$(CUSTOM_THIRD_PATH)/librdkafka
 
 # Flags passed to the preprocessor.
 CPPFLAGS += -isystem -shared -fPIC -D_DB_POOL_ -D_DEBUG -DUSR_LOG_MSG\
@@ -42,6 +42,7 @@ INCLUDE_PATHS = -I/usr/local/libmemcached-1.0.7/include \
 				-I$(THIRD_PATH)\
 				-I/usr/local/include\
 				-I/usr/include/mysql\
+				-I$(CUSTOM_THIRD_PATH)/librdkafka/src\
 				-I$(USER_DIR)\
 				-I$(CUSTOM_THIRD_PATH)/hiredis\
 				-I$(CUSTOM_THIRD_PATH)\
@@ -96,11 +97,11 @@ star_logic.o : ./star_logic.cc ./star_logic.h
 star_redis.o : ./star_redis.cc ./star_redis.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./star_redis.cc $(INCLUDE_PATHS)
 
-#forex_schduler_engine.o : ./forex_schduler_engine.cc ./forex_schduler_engine.h
-#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./forex_schduler_engine.cc $(INCLUDE_PATHS)
+star_schduler_engine.o : ./star_schduler_engine.cc ./star_schduler_engine.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./star_schduler_engine.cc $(INCLUDE_PATHS)
 	
-#pull_engine.o : ./pull_engine.cc ./pull_engine.h
-#	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./pull_engine.cc $(INCLUDE_PATHS)
+star_kafka.o : ./star_kafka.cc ./star_kafka.h
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./star_kafka.cc $(INCLUDE_PATHS)
 	
 #sina_pull_engine.o : ./sina_pull_engine.cc ./sina_pull_engine.h
 #	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c ./sina_pull_engine.cc $(INCLUDE_PATHS)
@@ -132,9 +133,9 @@ http_api.o :  $(USER_DIR)/net/http_api.cc $(USER_DIR)/net/http_api.h
 packet_processing.o :  $(USER_DIR)/net/packet_processing.cc $(USER_DIR)/net/packet_processing.h
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/net/packet_processing.cc $(INCLUDE_PATHS)
 
-$(PLUGIN) : star_init.o star_logic.o star_redis.o logic_unit.o quotations_infos.o sina_pull_engine.o\
-	redis_pool.o mysql_pool.o data_redis_engine.o data_mysql_engine.o\
+$(PLUGIN) : star_init.o star_logic.o star_redis.o star_kafka.o star_schduler_engine.o\
+	logic_unit.o quotations_infos.o redis_pool.o mysql_pool.o data_redis_engine.o data_mysql_engine.o\
 	data_engine.o http_api.o packet_processing.o\
-	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lcurl -lrt -ldl -lmysqlclient \
+	$(CUSTOM_THIRD_PATH)/dmg_fp/lib/dmg_fp.a $(LIB_DIR)/mylib/base/lib/mybase.a $(LIB_DIR)/mylib/third_party/lib/libhiredis.a  $(CUSTOM_THIRD_PATH)/librdkafka/librdkafka.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(LINK_PATHS) -lpthread -lexpat -lrt -ldl -lmysqlclient -lcurl  \
 	$^ -o $@

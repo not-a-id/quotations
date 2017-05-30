@@ -18,7 +18,8 @@ enum QUOTATIONS_TYPE {
   STOCK_TYPE =1,
   GOOD_TYPE = 2,
   FUTURES_TYPE = 3,
-  FOREX_TYPE = 4
+  FOREX_TYPE = 4,
+  STAR_TYPE = 5
 };
 
 class ConnectionSchduler {
@@ -369,8 +370,9 @@ class Quotations {
   }
 
   std::string ValueSerialize();
+  
+  void Derialization(base_logic::DictionaryValue* dict);
 
- private:
   class Data {
    public:
     Data()

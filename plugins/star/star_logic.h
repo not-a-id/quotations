@@ -4,6 +4,7 @@
 #ifndef QUOTATIONS_STAR_STAR_LOGIC_
 #define QUOTATIONS_STAR_STAR_LOGIC_
 
+#include "star/star_kafka.h"
 #include "basic/basictypes.h"
 #include "core/common.h"
 #include "star/star_redis.h"
@@ -47,6 +48,7 @@ class Starlogic {
  private:
   star_logic::StarRedis* star_redis_;
   star_logic::StarSchdulerManager* star_schduler_;
+  star_logic::StarKafka* star_kafka_;
 };
 }  // namespace goods_logic
 

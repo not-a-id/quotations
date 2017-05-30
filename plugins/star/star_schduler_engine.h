@@ -6,6 +6,7 @@
 
 #include "logic/quotations_infos.h"
 #include "star/star_redis.h"
+#include "star/star_kafka.h"
 #include "schduler/schduler_engine.h"
 #include "thread/base_thread_handler.h"
 #include "thread/base_thread_lock.h"
@@ -26,7 +27,9 @@ class StarSchdulerManager {
   StarSchdulerManager();
   virtual ~StarSchdulerManager();
 
-  void InitRedis(star_logic::StarRedis* goods_redis);
+  void InitRedis(star_logic::StarRedis* star_redis);
+  
+  void InitKafka(star_logic::StarKafka* star_kafka);
 
   void TimeEvent(int opcode, int time);
  private:
@@ -40,6 +43,7 @@ class StarSchdulerManager {
   void InitStarSymbol();
  private:
   star_logic::StarRedis *star_redis_;
+  star_logic::StarKafka *star_kafka_;
   quotations_schduler::SchdulerEngine* schduler_engine_;
   StarCache *star_cache_;
   struct threadrw_t *lock_;

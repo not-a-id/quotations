@@ -28,6 +28,10 @@ Starlogic::~Starlogic() {
     delete star_redis_;
     star_redis_ = NULL;
   }
+  if (star_kafka_) {
+    delete star_kafka_;
+    star_kafka_;
+  }
   if (star_schduler_) {
     delete star_schduler_;
     star_schduler_ = NULL;
@@ -46,7 +50,8 @@ bool Starlogic::Init() {
   star_redis_ = new star_logic::StarRedis(config);
   star_schduler_ = star_logic::StarSchdulerEngine::GetSchdulerManager();
   star_schduler_->InitRedis(star_redis_);
-
+  star_kafka_ = new star_logic::StarKafka(config); 
+  star_schduler_->InitKafka(star_kafka_);
   return true;
 }
 
@@ -99,12 +104,14 @@ bool Starlogic::OnBroadcastClose(struct server *srv, const int socket) {
 
 bool Starlogic::OnIniTimer(struct server *srv) {
   if (srv->add_time_task != NULL) {
-    srv->add_time_task(srv, "star", UPDATE_STAR_DATA, 3, -1);
+    LOG_MSG("OnIniTimer");
+    srv->add_time_task(srv, "star", UPDATE_STAR_DATA, 10, -1);
   }
   return true;
 }
 
 bool Starlogic::OnTimeout(struct server *srv, char *id, int opcode, int time) {
+  LOG_MSG("OnTimeout");
   star_schduler_->TimeEvent(opcode, time);
   return true;
 }
